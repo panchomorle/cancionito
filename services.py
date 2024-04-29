@@ -17,6 +17,7 @@ def enviar_mensaje_whatsapp(data):
         whatsapp_token = sett.whatsapp_token
         whatsapp_url = sett.whatsapp_url
         headers = {'Content-Type': 'application/json',
+                   'Access-Control-Allow-Origin': '*',
                    'Authorization': 'Bearer '+whatsapp_token}
         
         response = requests.post(whatsapp_url, headers=headers, data=data)
@@ -24,7 +25,8 @@ def enviar_mensaje_whatsapp(data):
             print("mensaje respondido")
             return 'mensaje enviado'
         else:
-            print("no se respondió el mensaje")
+            print("El status code es: "+str(response.status_code))
+            print("El mensaje era: "+str(response)) ##ENTRÓ ACÁ
             return 'mensaje no enviado', response.status_code
     except Exception as e:
         return e,403
