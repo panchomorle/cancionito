@@ -28,15 +28,16 @@ def recibir_mensajes():
         entry = body['entry'][0]
         changes = entry['changes'][0]
         value = changes['value']
-        messages = value['messages'][0]
-        number = messages['from']
-        messageId = messages['id']
+        message = value['messages'][0]
+        number = message['from']
+        messageId = message['id']
         contacts = value['contacts'][0]
         name = contacts['profile']['name']
         ## text = messages['text']['body']
         #Lo extraigo a una funcion en services para manejar el type
-        text = services.obtener_mensaje_whatsapp(messages)
-        print(text) ##recibe "hola" -> el problema está en la respuesta
+        text = services.obtener_mensaje_whatsapp(message)
+        print("body: ",text) ##recibe "hola" -> el problema está en la respuesta
+        print("number: ",number)
         ##el problema tampoco está en los tokens, ya que los lee.
         services.administrar_chatbot(text, number, messageId, name)
 

@@ -26,7 +26,7 @@ def enviar_mensaje_whatsapp(data):
             return 'mensaje enviado'
         else:
             print("El status code es: "+str(response.status_code))
-            print("El mensaje era: "+str(response)) ##ENTRÓ ACÁ
+            print("El mensaje era: "+str(data)) ##ENTRÓ ACÁ
             return 'mensaje no enviado', response.status_code
     except Exception as e:
         return e,403
