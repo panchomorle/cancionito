@@ -36,7 +36,8 @@ def recibir_mensajes():
         ## text = messages['text']['body']
         #Lo extraigo a una funcion en services para manejar el type
         text = services.obtener_mensaje_whatsapp(messages)
-        print(sett.token) ##recibe "hola" -> el problema está en la respuesta
+        print(text) ##recibe "hola" -> el problema está en la respuesta
+        ##el problema tampoco está en los tokens, ya que los lee.
         services.administrar_chatbot(text, number, messageId, name)
 
         return 'enviado'

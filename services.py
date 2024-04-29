@@ -21,8 +21,10 @@ def enviar_mensaje_whatsapp(data):
         
         response = requests.post(whatsapp_url, headers=headers, data=data)
         if response.status_code == 200:
+            print("mensaje respondido")
             return 'mensaje enviado'
         else:
+            print("no se respondió el mensaje")
             return 'mensaje no enviado', response.status_code
     except Exception as e:
         return e,403
