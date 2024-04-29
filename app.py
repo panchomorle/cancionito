@@ -36,7 +36,7 @@ def recibir_mensajes():
         ## text = messages['text']['body']
         #Lo extraigo a una funcion en services para manejar el type
         text = services.obtener_mensaje_whatsapp(messages)
-        print(text)
+        print(sett.token) ##recibe "hola" -> el problema está en la respuesta
         services.administrar_chatbot(text, number, messageId, name)
 
         return 'enviado'
