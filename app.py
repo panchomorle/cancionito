@@ -43,6 +43,7 @@ def recibir_mensajes():
         return 'enviado'
     except Exception as e:
         print("hubo un error al recibir el mensaje")
+        print("Excepción: "+str(e))
         return 'no enviado'+str(e)
 
 if __name__ == '__main__':

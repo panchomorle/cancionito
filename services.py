@@ -20,7 +20,7 @@ def enviar_mensaje_whatsapp(data):
                    'Access-Control-Allow-Origin': '*',
                    'Authorization': 'Bearer '+whatsapp_token}
         
-        response = requests.post(whatsapp_url, headers=headers, data=data)
+        response = requests.post(url=whatsapp_url, headers=headers, data=data)
         if response.status_code == 200:
             print("mensaje respondido")
             return 'mensaje enviado'
