@@ -37,8 +37,12 @@ def recibir_mensajes():
         #Lo extraigo a una funcion en services para manejar el type
         text = services.obtener_mensaje_whatsapp(message)
         print("body: ",text) ##recibe "hola" -> el problema está en la respuesta
-        print("number: ",number)
-        ##el problema tampoco está en los tokens, ya que los lee.
+        print("number: ",number) #El number viene cambiado (con un 9 adelante)
+
+        if number[0:2] == "54": #manejo para eliminar el 9
+            car = "54"
+            num = number[3:]
+            number = (car+num)
         services.administrar_chatbot(text, number, messageId, name)
 
         return 'enviado'
