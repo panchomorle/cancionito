@@ -1,4 +1,4 @@
-from flask import Flask, request # type: ignore
+from flask import Flask, request 
 import sett
 import services
 
@@ -36,10 +36,12 @@ def recibir_mensajes():
         ## text = messages['text']['body']
         #Lo extraigo a una funcion en services para manejar el type
         text = services.obtener_mensaje_whatsapp(messages)
+        print(text)
         services.administrar_chatbot(text, number, messageId, name)
 
         return 'enviado'
     except Exception as e:
+        print("hubo un error al recibir el mensaje")
         return 'no enviado'+str(e)
 
 if __name__ == '__main__':
