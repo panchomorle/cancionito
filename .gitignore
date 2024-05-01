@@ -1,3 +1,4 @@
 .env
 __pycache__
-requerimientos.txt
+requerimientos*
+cancionitobd-087fd621959d.json

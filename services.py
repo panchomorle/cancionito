@@ -1,6 +1,7 @@
 import requests # type: ignore
 import sett
 import json
+import google_sheets
 
 def obtener_mensaje_whatsapp(message):
     if 'type' not in message :
@@ -79,14 +80,15 @@ def administrar_chatbot(text, number, messageId, name):
         enviar_mensaje_whatsapp(data)
     else:
         ##CARGO EL JSON DE LA BDD
-        posibles_canciones = {
+        """posibles_canciones = { #EL JSON SE VE DE ESTA FORMA:
             "Padre amado":"https://imgv2-2-f.scribdassets.com/img/document/281897126/original/5ae918e126/1713539600?v=1",
             "Tengo paz":"https://imgv2-1-f.scribdassets.com/img/document/325877359/original/706763de2c/1712197720?v=1",
             "Jesucristo basta":"https://imgv2-2-f.scribdassets.com/img/document/467744741/original/88d82f751d/1710639242?v=1"
-        }
-        #SEPARO EL TEXTO POR ESPACIOS PARA VER SI SON CANCIONES
+        }"""
+        posibles_canciones = google_sheets.call()
+        #SEPARO EL TEXTO DEL USUARIO POR SALTOS DE LINEA PARA VER SI SON CANCIONES
         texto_separado = text.split("\n")
-        #COMPRUEBO QUE EL TEXTO SEAN CANCIONES
+            #COMPRUEBO QUE EL TEXTO SEAN CANCIONES:
         for texto in texto_separado: #itero sobre las canciones del usuario
             coincidence = False
             for nombre, imagen in posibles_canciones.items():
