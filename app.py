@@ -6,7 +6,8 @@ app = Flask(__name__)
 
 @app.route('/bienvenido', methods=['GET'])
 def bienvenido():
-    return "Hola, me llamo cancionito!"
+    imagen = "<img src='https://roico.com/wp-content/uploads/2016/05/ROI_Headshot_John-Pollack.jpg'>"
+    return imagen
 
 @app.route('/webhook', methods=['GET'])
 def verificar_token():

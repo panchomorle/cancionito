@@ -67,6 +67,12 @@ def image_message(number, url):
     )
     return data
 
+def dividir_urls_por_espacios(cancion: str):
+    cancion = cancion.strip() #quito espacios adelante y atras
+    array_canciones = cancion.split(" ") #separo por espacios
+    print(array_canciones)
+    return array_canciones
+
 def administrar_chatbot(text, number, messageId, name):
     text = text.lower() ##mensaje que envió el usuario
     canciones = [] #lista de IMAGENES de canciones a enviar
@@ -107,11 +113,18 @@ def administrar_chatbot(text, number, messageId, name):
         if el_texto_tiene_canciones:
             for cancion, encontrada in canciones:
                 if encontrada:
-                    data = image_message(number, cancion) #notar que acá cancion viene de "imagen", que es una URL
+                    c = dividir_urls_por_espacios(cancion)
+                    if isinstance(c, list): #si el campo 'canción' era una lista (la cancion tiene mas de 1 pág)
+                        for each in c:
+                            data = image_message(number, each)
+                            enviar_mensaje_whatsapp(data)
+                    else:
+                        data = image_message(number, cancion) #notar que acá cancion viene de "imagen", que es una URL
+                        enviar_mensaje_whatsapp(data)
+                    #print(data)
                 else: #notar que acá cancion viene de "texto", un string con el nombre de la cancion.
                     data = text_message(number, f'No se encontraron coincidencias para "{cancion}" prueba escribirla de otra forma!')
-
-                enviar_mensaje_whatsapp(data)
+                    enviar_mensaje_whatsapp(data)
         else:
             data = text_message(number, "No entendí :C intentá escribir el nombre de algún corito o alabanza porfis")
-            enviar_mensaje_whatsapp(data) 
+            enviar_mensaje_whatsapp(data)
