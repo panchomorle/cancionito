@@ -1,6 +1,7 @@
 from flask import Flask, request 
 import sett
 import services
+import asyncio
 
 app = Flask(__name__)
 
@@ -38,7 +39,7 @@ def recibir_mensajes():
         #Lo extraigo a una funcion en services para manejar el type
         text = services.obtener_mensaje_whatsapp(message)
         number = services.filtrar_number(number) #El number viene cambiado (+549), manejo para eliminar el 9 extra
-        services.administrar_chatbot(text, number, messageId, name)
+        asyncio.run(services.administrar_chatbot(text, number, messageId, name))
 
         return 'enviado'
     except Exception as e:
