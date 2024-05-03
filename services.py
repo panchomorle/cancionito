@@ -3,6 +3,7 @@ import sett
 import json
 import google_sheets
 import regex #para eliminar caracteres no alfanuméricos
+import random as r
 
 def obtener_mensaje_whatsapp(message):
     if 'type' not in message :
@@ -69,6 +70,17 @@ def image_message(number, url):
     )
     return data
 
+#--------funcion que permite enviar canción entera si tiene más de 1 pág-----------
+def enviar_cancion(number, url): 
+    URLS = url.split(" ") #genero un array separando por espacios
+    if isinstance(URLS, list): #si el campo 'URLS' era una lista (la cancion tiene mas de 1 pág)
+        for each in URLS:
+            data = image_message(number, each)
+            enviar_mensaje_whatsapp(data)
+    else:
+        data = image_message(number, url)
+        enviar_mensaje_whatsapp(data)
+
 def normalizar_string(text: str):
     replacements = (
         ("á", "a"),
@@ -90,24 +102,34 @@ def normalizar_array(array: list):
         array_normalizado.append(normalizar_string(text))
     return array_normalizado
 
+def elegir_random(posibles_canciones: dict):
+    lista_titulos = list(posibles_canciones.keys())
+    indice = r.randint(0, len(posibles_canciones)-1)
+    return lista_titulos[indice]
 
 def administrar_chatbot(text, number, messageId, name):
     texto = normalizar_string(text) ##sin Special Characters y en lower
-    canciones = [] #lista de IMAGENES de canciones a enviar
+    canciones = [] #lista de IMAGENES de canciones encontradas a enviar
+    posibles_canciones = {} #BASE DE DATOS JSON
     el_texto_tiene_canciones = False #asumo que por defecto el usuario no pide canciones
 
     posibles_saludos=['hola', 'alo', 'hi', 'hello', 'ola', 'buenas', 'buen dia', 'buenos dias', 'good morning', 'how are you', 'como estas', 'que tal']
     if any(saludo in texto for saludo in posibles_saludos):
-        data = text_message(number, "¡Hola! Mi nombre es CancioNito🎵. Pedime una canción o una lista de canciones separadas por saltos de línea :D")
+        sugerencias = ["\n"+elegir_random() for _ in range(3)]
+        data = text_message(number, f"¡Hola! Mi nombre es CancioNito🎵. Pedime una canción o una lista de canciones separadas de esta forma: {sugerencias}")
         enviar_mensaje_whatsapp(data)
         data = text_message(number,'Podés pedirme cualquier canción del coritario Hossanna o escribir "random" para una canción aleatoria!💫')
         enviar_mensaje_whatsapp(data)
-    elif "random" in text:
-        data = text_message(number,'Mi desarrollador (Juampi) todavía no me programó para hacer esto :\'C')
-        enviar_mensaje_whatsapp(data)
-    else:
+    elif "random" in texto:
+        #-----llamo a la BDD solo si el array sigue vacio (posibles_canciones = {})
+        posibles_canciones = google_sheets.call() if not posibles_canciones else posibles_canciones
+        clave = elegir_random(posibles_canciones) #elijo una clave random de la bdd
+        valor = posibles_canciones[clave] #extraigo su valor
+        #text_message(number,'Mi desarrollador (Juampi) todavía no me programó para hacer esto :\'C')
+        enviar_cancion(number, valor) #envio la imagen random
+    else: #---------------------------MOTOR PRINCIPAL: CHECKEO DE CANCIONES-----------------------
         ##CARGO EL JSON DE LA BDD: key=Title value=URL
-        posibles_canciones = google_sheets.call()
+        posibles_canciones = google_sheets.call() if not posibles_canciones else posibles_canciones
         #SEPARO EL TEXTO DEL USUARIO POR SALTOS DE LINEA PARA VER SI SON CANCIONES
         texto_separado = normalizar_array(text.split("\n")) #array de canciones pedidas por el usuario
             #COMPRUEBO QUE CADA LINEA SEA UNA CANCION VÁLIDA:
@@ -125,19 +147,11 @@ def administrar_chatbot(text, number, messageId, name):
                 tupla = txt, False #creo una tupla con el TITULO indicando que NO fue encontrado
                 canciones.append(tupla) #guardo la tupla de la cancion no encontrada
 
-        #FUNCIONALIDAD PRINCIPAL = SI HAY CANCIONES, MANDO IMAGEN.
+        #--------FUNCIONALIDAD DE ENVIO DE CANCIONES = SI HAY CANCIONES, MANDO IMAGEN.
         if el_texto_tiene_canciones:
             for cancion, encontrada in canciones:
                 if encontrada:
-                    c = cancion.split(" ") #genero un array separando por espacios
-                    if isinstance(c, list): #si el campo 'canción' era una lista (la cancion tiene mas de 1 pág)
-                        for each in c:
-                            data = image_message(number, each)
-                            enviar_mensaje_whatsapp(data)
-                    else:
-                        data = image_message(number, cancion) #notar que acá cancion viene de "imagen", que es una URL
-                        enviar_mensaje_whatsapp(data)
-                    #print(data)
+                    enviar_cancion(number, cancion) #notar que acá cancion viene de "imagen", que es una URL
                 else: #notar que acá cancion viene de "texto", un string con el nombre de la cancion.
                     data = text_message(number, f'No se encontraron coincidencias para "{cancion}" prueba escribirla de otra forma!')
                     enviar_mensaje_whatsapp(data)
