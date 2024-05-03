@@ -77,11 +77,12 @@ def normalizar_string(text: str):
         ("ó", "o"),
         ("ú", "u"),
     )
-    sin_tildes = text.strip() #acá le quito los espacios de atrás y adelante
+    texto_lower = text.lower() #convierto todo a minusculas
     for a, b in replacements: #reemplazo los 'a' de la tupla por los 'b' de la tupla
-        sin_tildes = sin_tildes.replace(a, b).replace(a.upper(), b.upper()) #tanto en lower como uppercase
-    texto_limpio = regex.sub(r'[^\w\s\n]', '', sin_tildes) #quito los no alfanuméricos con regex
-    texto_normalizado = texto_limpio.lower() #convierto todo a minusculas
+        texto_lower = texto_lower.replace(a, b)
+    texto_limpio = regex.sub(r'[^\w\s\n]', '', texto_lower) #quito los no alfanuméricos con regex
+    
+    texto_normalizado = texto_limpio.strip() #acá le quito los espacios de atrás y adelante
     return texto_normalizado
 
 
@@ -90,7 +91,7 @@ async def administrar_chatbot(text, number, messageId, name):
     canciones = [] #lista de IMAGENES de canciones a enviar
     el_texto_tiene_canciones = False #asumo que por defecto el usuario no pide canciones
 
-    posibles_saludos=['hola', 'alo', 'hi', 'hello', 'ola', 'buenas', 'buen dia']
+    posibles_saludos=['hola', 'alo', 'hi', 'hello', 'ola', 'buenas', 'buen dia', 'buenos dias', 'good morning', 'how are you', 'como estas', 'que tal']
     if any(saludo in text for saludo in posibles_saludos):
         data = text_message(number, "¡Hola! Mi nombre es CancioNito🎵. Pedime una canción o una lista de canciones separadas por saltos de línea :D")
         await enviar_mensaje_whatsapp(data)
@@ -100,21 +101,17 @@ async def administrar_chatbot(text, number, messageId, name):
         data = text_message(number,'Mi desarrollador (Juampi) todavía no me programó para hacer esto :\'C')
         await enviar_mensaje_whatsapp(data)
     else:
-        ##CARGO EL JSON DE LA BDD
-        """posibles_canciones = { #EL JSON SE VE DE ESTA FORMA:
-            "Padre amado":"https://imgv2-2-f.scribdassets.com/img/document/281897126/original/5ae918e126/1713539600?v=1",
-            "Tengo paz":"https://imgv2-1-f.scribdassets.com/img/document/325877359/original/706763de2c/1712197720?v=1",
-            "Jesucristo basta":"https://imgv2-2-f.scribdassets.com/img/document/467744741/original/88d82f751d/1710639242?v=1"
-        }"""
+        ##CARGO EL JSON DE LA BDD: key=Title value=URL
         posibles_canciones = google_sheets.call()
         #SEPARO EL TEXTO DEL USUARIO POR SALTOS DE LINEA PARA VER SI SON CANCIONES
-        texto_separado = text.split("\n") #array de canciones pedidas por el usuario
+        print(texto)
+        texto_separado = texto.split("\n") #array de canciones pedidas por el usuario
         print(texto_separado)
             #COMPRUEBO QUE CADA LINEA SEA UNA CANCION VÁLIDA:
-        for texto in texto_separado: #itero sobre las canciones del usuario
+        for txt in texto_separado: #itero sobre las canciones del usuario
             coincidence = False
             for nombre, imagen in posibles_canciones.items():
-                if texto == nombre.lower():
+                if txt == nombre:
                     tupla = imagen,True #creo una tupla con la IMAGEN indicando que fue encontrada
                     canciones.append(tupla) #guardo la tupla para la cancion encontrada
                     coincidence = True
@@ -122,7 +119,7 @@ async def administrar_chatbot(text, number, messageId, name):
             if coincidence:
                 el_texto_tiene_canciones = True
             else: #si el texto del usuario no coincidió con ninguna canción de la bdd
-                tupla = texto, False #creo una tupla con el TITULO indicando que NO fue encontrado
+                tupla = txt, False #creo una tupla con el TITULO indicando que NO fue encontrado
                 canciones.append(tupla) #guardo la tupla de la cancion no encontrada
 
         #FUNCIONALIDAD PRINCIPAL = SI HAY CANCIONES, MANDO IMAGEN.
@@ -143,4 +140,4 @@ async def administrar_chatbot(text, number, messageId, name):
                     await enviar_mensaje_whatsapp(data)
         else:
             data = text_message(number, "No entendí :C intentá escribir el nombre de algún corito o alabanza porfis")
-            enviar_mensaje_whatsapp(data)
+            await enviar_mensaje_whatsapp(data)
