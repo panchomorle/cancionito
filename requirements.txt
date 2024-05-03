@@ -1,5 +1,4 @@
 argcomplete==3.3.0
-asyncio==3.4.3
 blinker==1.8.1
 cachetools==5.3.3
 certifi==2024.2.2
