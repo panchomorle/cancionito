@@ -115,7 +115,9 @@ def administrar_chatbot(text, number, messageId, name):
 
     posibles_saludos=['hola', 'alo', 'hi', 'hello', 'ola', 'buenas', 'buen dia', 'buenos dias', 'good morning', 'how are you', 'como estas', 'que tal']
     if any(saludo in texto for saludo in posibles_saludos):
-        sugerencias = ["\n"+elegir_random() for _ in range(3)]
+        posibles_canciones = google_sheets.call() if not posibles_canciones else posibles_canciones
+        sugerencias=""
+        sugerencias =''.join("\n"+elegir_random(posibles_canciones) for _ in range(3))
         data = text_message(number, f"¡Hola! Mi nombre es CancioNito🎵. Pedime una canción o una lista de canciones separadas de esta forma: {sugerencias}")
         enviar_mensaje_whatsapp(data)
         data = text_message(number,'Podés pedirme cualquier canción del coritario Hossanna o escribir "random" para una canción aleatoria!💫')
