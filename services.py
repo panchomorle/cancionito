@@ -4,6 +4,7 @@ import json
 import google_sheets
 import regex #para eliminar caracteres no alfanuméricos
 import random as r
+import time
 
 def obtener_mensaje_whatsapp(message):
     if 'type' not in message :
@@ -32,7 +33,7 @@ def enviar_mensaje_whatsapp(data):
         
         response = requests.post(url=whatsapp_url, headers=headers, data=data)
         if response.status_code == 200:
-            print("se envió"+str(data))
+            #print("se envió"+str(data))
             return 'mensaje enviado'
         else:
             print("El status code es: "+str(response.status_code))
@@ -77,9 +78,11 @@ def enviar_cancion(number, url):
         for each in URLS:
             data = image_message(number, each)
             enviar_mensaje_whatsapp(data)
+            time.sleep(1)
     else:
         data = image_message(number, url)
         enviar_mensaje_whatsapp(data)
+        time.sleep(2)
 
 def normalizar_string(text: str):
     replacements = (
@@ -114,15 +117,15 @@ def administrar_chatbot(text, number, messageId, name):
     el_texto_tiene_canciones = False #asumo que por defecto el usuario no pide canciones
 
     posibles_saludos=['hola', 'alo', 'hi', 'hello', 'ola', 'buenas', 'buen dia', 'buenos dias', 'good morning', 'how are you', 'como estas', 'que tal']
-    if any(saludo in texto for saludo in posibles_saludos):
+    if any(saludo == texto for saludo in posibles_saludos):
         posibles_canciones = google_sheets.call() if not posibles_canciones else posibles_canciones
-        sugerencias=""
         sugerencias =''.join("\n"+elegir_random(posibles_canciones) for _ in range(3))
         data = text_message(number, f"¡Hola! Mi nombre es CancioNito🎵. Pedime una canción o una lista de canciones separadas de esta forma: {sugerencias}")
         enviar_mensaje_whatsapp(data)
+        time.sleep(2)
         data = text_message(number,'Podés pedirme cualquier canción del coritario Hossanna o escribir "random" para una canción aleatoria!💫')
         enviar_mensaje_whatsapp(data)
-    elif "random" in texto:
+    elif "random" == texto or "ramdom" == texto:
         #-----llamo a la BDD solo si el array sigue vacio (posibles_canciones = {})
         posibles_canciones = google_sheets.call() if not posibles_canciones else posibles_canciones
         clave = elegir_random(posibles_canciones) #elijo una clave random de la bdd
@@ -157,6 +160,7 @@ def administrar_chatbot(text, number, messageId, name):
                 else: #notar que acá cancion viene de "texto", un string con el nombre de la cancion.
                     data = text_message(number, f'No se encontraron coincidencias para "{cancion}" prueba escribirla de otra forma!')
                     enviar_mensaje_whatsapp(data)
+                    time.sleep(2)
         else:
             data = text_message(number, "No entendí :C intentá escribir el nombre de algún corito o alabanza porfis")
             enviar_mensaje_whatsapp(data)
