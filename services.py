@@ -78,11 +78,11 @@ def enviar_cancion(number, url):
         for each in URLS:
             data = image_message(number, each)
             enviar_mensaje_whatsapp(data)
-            time.sleep(1)
+            time.sleep(0.4)
     else:
         data = image_message(number, url)
         enviar_mensaje_whatsapp(data)
-        time.sleep(2)
+        time.sleep(0.8)
 
 def normalizar_string(text: str):
     replacements = (
@@ -122,7 +122,7 @@ def administrar_chatbot(text, number, messageId, name):
         sugerencias =''.join("\n"+elegir_random(posibles_canciones) for _ in range(3))
         data = text_message(number, f"¡Hola! Mi nombre es CancioNito🎵. Pedime una canción o una lista de canciones separadas de esta forma: {sugerencias}")
         enviar_mensaje_whatsapp(data)
-        time.sleep(2)
+        time.sleep(0.4)
         data = text_message(number,'Podés pedirme cualquier canción del coritario Hossanna o escribir "random" para una canción aleatoria!💫')
         enviar_mensaje_whatsapp(data)
     elif "random" == texto or "ramdom" == texto:
@@ -160,7 +160,7 @@ def administrar_chatbot(text, number, messageId, name):
                 else: #notar que acá cancion viene de "texto", un string con el nombre de la cancion.
                     data = text_message(number, f'No se encontraron coincidencias para "{cancion}" prueba escribirla de otra forma!')
                     enviar_mensaje_whatsapp(data)
-                    time.sleep(2)
+                    time.sleep(0.8)
         else:
             data = text_message(number, "No entendí :C intentá escribir el nombre de algún corito o alabanza porfis")
             enviar_mensaje_whatsapp(data)

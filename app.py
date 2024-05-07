@@ -38,6 +38,8 @@ def recibir_mensajes():
         #Lo extraigo a una funcion en services para manejar el type
         text = services.obtener_mensaje_whatsapp(message)
         number = services.filtrar_number(number) #El number viene cambiado (+549), manejo para eliminar el 9 extra
+        
+        ##Este proceso está demorando más de 30s
         services.administrar_chatbot(text, number, messageId, name)
 
         return 'enviado'
